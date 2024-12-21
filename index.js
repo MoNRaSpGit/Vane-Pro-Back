@@ -556,7 +556,35 @@ app.get('/api/filtrar', (req, res) => {
   }
   
 
+ app.post('/api/empresas', (req, res) => {
+    const { nombre } = req.body;
 
+    console.log('[EMPRESAS] Datos recibidos del frontend:', { nombre });
+
+    // Validar que el nombre no esté vacío
+    if (!nombre || nombre.trim() === '') {
+        console.log('[EMPRESAS] El nombre de la empresa es obligatorio');
+        return res.status(400).json({ message: 'El nombre de la empresa es obligatorio' });
+    }
+
+    // Consulta para insertar la empresa
+    const query = 'INSERT INTO empresa (nombre) VALUES (?)';
+
+    console.log('[EMPRESAS] Ejecutando consulta:', query);
+    db.query(query, [nombre], (err, result) => {
+        if (err) {
+            console.error('[EMPRESAS] Error al insertar en la base de datos:', err.message);
+            return res.status(500).json({ message: 'Error interno del servidor' });
+        }
+    
+        console.log('[EMPRESAS] Empresa insertada correctamente:', { id: result.insertId, nombre });
+        return res.status(201).json({ 
+            message: 'Empresa agregada correctamente', 
+            id: result.insertId, 
+            nombre: nombre // Asegúrate de incluir el nombre
+        });
+    });
+});
 
 
 
