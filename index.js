@@ -587,6 +587,29 @@ app.get('/api/filtrar', (req, res) => {
 });
 
 
+app.get('/api/empresas', (req, res) => {
+  console.log('[GET EMPRESAS] Solicitando todas las empresas');
+
+  const query = 'SELECT id, nombre, descripcion, fecha_creacion FROM empresa'; // Ajuste según la tabla
+
+  db.query(query, (err, results) => {
+      if (err) {
+          console.error('[GET EMPRESAS] Error al consultar la base de datos:', err.message);
+          return res.status(500).json({ message: 'Error interno del servidor' });
+      }
+
+      console.log('[GET EMPRESAS] Resultados obtenidos de la base de datos:', results);
+
+      if (results.length > 0) {
+          return res.status(200).json(results);
+      } else {
+          console.log('[GET EMPRESAS] No se encontraron empresas.');
+          return res.status(404).json({ message: 'No se encontraron empresas' });
+      }
+  });
+});
+
+
 
 
 
