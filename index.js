@@ -609,30 +609,49 @@ app.get('/api/empresas', (req, res) => {
   });
 });
 
+
+
 app.post('/api/register', (req, res) => {
-  const { nombre, password, rol } = req.body;
+  const { nombre, password, rol, claveEspecial } = req.body;
 
   // Validación básica
   if (!nombre || !password || !rol) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
 
-  // Simulación de inserción en base de datos
-  try {
-      const nuevoUsuario = { id: Date.now(), nombre, rol }; // ID simulado
-      console.log('Usuario registrado:', nuevoUsuario);
+  // Validación para rol de admin
+  if (rol === 'admin') {
+      if (claveEspecial !== '1234') {
+          return res.status(403).json({ error: 'Clave especial incorrecta para administrador.' });
+      }
+  }
+
+  // Consulta SQL para insertar el nuevo usuario
+  const query = 'INSERT INTO usuarios (nombre, password, rol) VALUES (?, ?, ?)';
+  const values = [nombre, password, rol];
+
+  db.query(query, values, (err, result) => {
+      if (err) {
+          console.error('Error al insertar usuario en la base de datos:', err.message);
+          return res.status(500).json({
+              error: 'Error interno del servidor. Por favor, inténtalo más tarde.',
+          });
+      }
 
       // Respuesta con éxito
+      const nuevoUsuario = {
+          id: result.insertId,
+          nombre,
+          rol,
+      };
+
+      console.log('Usuario registrado en la base de datos:', nuevoUsuario);
+
       return res.status(201).json({
           message: 'Usuario registrado exitosamente',
           usuario: nuevoUsuario,
       });
-  } catch (error) {
-      console.error('Error al registrar usuario:', error.message);
-      return res.status(500).json({
-          error: 'Error interno del servidor. Por favor, inténtalo más tarde.',
-      });
-  }
+  });
 });
 
 
