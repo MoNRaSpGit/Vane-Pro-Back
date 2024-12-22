@@ -609,7 +609,31 @@ app.get('/api/empresas', (req, res) => {
   });
 });
 
+app.post('/api/register', (req, res) => {
+  const { nombre, password, rol } = req.body;
 
+  // Validación básica
+  if (!nombre || !password || !rol) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  }
+
+  // Simulación de inserción en base de datos
+  try {
+      const nuevoUsuario = { id: Date.now(), nombre, rol }; // ID simulado
+      console.log('Usuario registrado:', nuevoUsuario);
+
+      // Respuesta con éxito
+      return res.status(201).json({
+          message: 'Usuario registrado exitosamente',
+          usuario: nuevoUsuario,
+      });
+  } catch (error) {
+      console.error('Error al registrar usuario:', error.message);
+      return res.status(500).json({
+          error: 'Error interno del servidor. Por favor, inténtalo más tarde.',
+      });
+  }
+});
 
 
 
